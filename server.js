@@ -46,23 +46,16 @@ app.get("/scrape", function (req, res) {
                 .find(".blurb > p")
                 .text();
 
-            console.log(result);
+            console.log("HERE " + result.title);
 
-            db.Article.find({
+            db.Article.update({
                 title: result.title
-            }).then(function (answer) {
-                if (answer.length != 0) {
-                    db.Article.create(result)
-                        .then(function (dbArticle) {
-                            console.log("HERE:" + dbArticle);
-                        })
-                        .catch(function (err) {
-                            return res.json(err);
-                        });
-                }
+            }, {
+                result
+            }, {
+                upsert: true
             });
         });
-
 
         res.send("Scrape Complete");
     });
@@ -99,7 +92,7 @@ app.post("/articles/:id", function (req, res) {
     db.Note.create(req.body)
         .then(function (dbNote) {
             console.log(req.body);
-            console.log("HERE: " + req.params.id);
+            console.log(req.params.id);
             console.log(dbNote._id);
             // If a Note was created successfully, find one Article with an `_id` equal to `req.params.id`. Update the Article to be associated with the new Note
             // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
