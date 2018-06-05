@@ -48,13 +48,15 @@ app.get("/scrape", function (req, res) {
 
             console.log("HERE " + result.title);
 
-            db.Article.update({
-                title: result.title
-            }, {
-                result
-            }, {
-                upsert: true
-            });
+            db.Article.create(result)
+                .then(function (dbArticle) {
+                    // View the added result in the console
+                    console.log(dbArticle);
+                })
+                .catch(function (err) {
+                    // If an error occurred, send it to the client
+                    return res.json(err);
+                });
         });
 
         res.send("Scrape Complete");
@@ -75,8 +77,8 @@ app.get("/articles", function (req, res) {
 //get article by id and populate it with its note/notes
 app.get("/articles/:id", function (req, res) {
     db.Article.findOne({
-            _id: req.params.id
-        })
+        _id: req.params.id
+    })
         .populate("note")
         .then(function (dbArticle) {
             res.json(dbArticle);
@@ -100,10 +102,10 @@ app.post("/articles/:id", function (req, res) {
             return db.Article.findOneAndUpdate({
                 _id: req.params.id
             }, {
-                note: dbNote._id
-            }, {
-                new: true
-            });
+                    note: dbNote._id
+                }, {
+                    new: true
+                });
         })
         .then(function (dbArticle) {
             // If we were able to successfully update an Article, send it back to the client
