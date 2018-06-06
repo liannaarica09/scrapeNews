@@ -45,16 +45,17 @@ $(document).on("click", ".noteBtn", function () {
             $("#notes").prepend("<textarea id='bodyinput' name='body' placeholder='Add the comment you're not making here.></textarea>");
             $("#notes").prepend("<input id='titleinput' name='title' placeholder='Title'>");
             $("#notes").prepend("<h2>" + data.title + "</h2>");
-            $("#notes").prepend("<button data-id='" + data._id + "' id='editNote <i class='fas fa-pen-square'>></i></button>");
-            $("#notes").prepend("<button data-id='" + data._id + "' id='deleteNote' <i class='fas fa-eraser'>></i></button>");
 
             // If there's a note in the article
             console.log(data.note);
             if (data.note) {
-                console.log("HERE:" + data.note.title);
+                console.log("HERE:" + data.note._id);
+                console.log(data._id);
                 var noteDiv = $('<div>');
                 noteDiv.append('<h2>' + data.note.title + '<h2>');
                 noteDiv.append('<p>' + data.note.body + '</p>');
+                noteDiv.append("<button data-id=" + data.note._id + " class='fas fa-pen-square editNote'> </button>");
+                noteDiv.append("<button data-id=" + data.note._id + " class='fas fa-eraser deleteNote'> </button>");
                 $('#notes').append(noteDiv);
             }
         });
@@ -94,3 +95,28 @@ $(document).on("click", "#savenote", function () {
     $("#titleinput").val("");
     $("#bodyinput").val("");
 });
+
+$(document).on("click", ".deleteNote", function (event) {
+    event.preventDefault();
+    console.log("Delete button clicked.");
+    // Make an AJAX GET request to delete the specific note
+    $.ajax({
+        type: "GET",
+        url: "/delete/" + $(this).attr("data-id"),
+
+        // On successful call
+        success: function (response) {
+            // Remove the p-tag from the DOM
+            selected.remove();
+            // Clear the note and title inputs
+            $("#note").val("");
+            $("#title").val("");
+            // Make sure the #action-button is submit (in case it's update)
+            $("#action-button").html("<button id='make-new'>Submit</button>");
+        }
+    });
+});
+
+    // $(document).on("click", ".editNote", function (event) {
+    //     event.preventDefault();
+    // });
