@@ -20,8 +20,24 @@ app.use(bodyParser.urlencoded({
 
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost/scrapeNews");
+var databaseUri = ("mongodb://localhost/scrapeNews");
 
+if (process.env.MONGODB_UIR) {
+    console.log(process.env);
+    mongoose.connect(process.env.MONGODB_UIR);
+} else {
+    mongoose.connect(databaseUri);
+}
+
+var mdb = mongoose.connection;
+
+mdb.on('error', function (err) {
+    console.log('Mongoose Error: ', error);
+});
+
+mdb.once('open', function () {
+    console.log('Mongoose connection succesfull.');
+});
 
 //routes
 
